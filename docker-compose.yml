@@ -1,17 +1,26 @@
 version: "3.9"
 
+networks:
+  sample-auth-app:
+
 volumes:
   postgres_data:
     driver: local
 
 services:
   api:
+    networks:
+      - sample-auth-app
+    container_name: api
     build: .
     ports:
       - "5000:5000"
     expose:
       - "5000"
   postgres:
+    networks:
+      - sample-auth-app
+    container_name: keycloak_postgres
     image: postgres:latest
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -19,16 +28,28 @@ services:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: keycloak
+    ports:
+      - "5435:5432"
+    expose:
+      - "5435"
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
+    networks:
+      - sample-auth-app
+    container_name: keycloak
+    command:
+      - start-dev
     environment:
+      KEYCLOAK_ADMIN: keycloak
+      KEYCLOAK_ADMIN_PASSWORD: keycloak
       KC_DB: postgres
       KC_DB_PASSWORD: keycloak
       KC_DB_URL_HOST: postgres
       KC_DB_URL_PORT: 5432
       KC_DB_URL_USERNAME: keycloak
       KC_DB_URL_DATABASE: keycloak
+#      - --import-realm   will use this when i can get a realm setup and exported
     ports:
       - "8085:8080"
     depends_on:
