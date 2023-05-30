@@ -9,6 +9,8 @@ services:
     build: .
     ports:
       - "5000:5000"
+    expose:
+      - "5000"
   postgres:
     image: postgres:latest
     volumes:
@@ -28,6 +30,6 @@ services:
       KC_DB_URL_USERNAME: keycloak
       KC_DB_URL_DATABASE: keycloak
     ports:
-      - "8082:8080"
+      - "8085:8080"
     depends_on:
       - postgres
