@@ -1,0 +1,28 @@
+version: "3.9"
+
+volumes:
+  postgres_data:
+    driver: local
+
+services:
+  api:
+    build: .
+    ports:
+      - "5000:5000"
+  postgres:
+    image: postgres:latest
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+
+    ports:
+      - "8082:8080"
+    depends_on:
+      - postgres
